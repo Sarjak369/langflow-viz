@@ -1,32 +1,21 @@
 [build-system]
-requires = ["setuptools>=68", "build>=1.2.1"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
-name = "lg-viz"                         
-version = "0.1.0"
-description = "Tiny, styled visualizer + analyzer for workflow graphs (Mermaid/HTML/PNG/SVG export)"
+name = "langflow-viz"
+version = "0.1.1"
+description = "Elegant visualizer and analyzer for LangGraph-like workflow graphs"
 readme = "README.md"
 requires-python = ">=3.9"
+authors = [{name = "Sarjak Maniar"}]
 license = {text = "MIT"}
-authors = [{ name="Sarjak Maniar", email="sarjakm369@gmail.com"}]
-keywords = ["graphviz", "mermaid", "workflow", "visualization"]
 classifiers = [
-  "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: MIT License",
-  "Operating System :: OS Independent"
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
 ]
 
 [project.urls]
-Homepage = "https://github.com/Sarjak369/lg_viz"
-Issues   = "https://github.com/Sarjak369/lg_viz/issues"
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["graph", "visualizer", "examples"]
-
-[tool.setuptools.package-data]
-visualizer = ["py.typed"]
-
-[tool.setuptools]
-include-package-data = true
+Homepage = "https://github.com/Sarjak369/langflow-viz"
+Repository = "https://github.com/Sarjak369/langflow-viz"
