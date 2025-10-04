@@ -8,8 +8,8 @@ version = "0.1.1"
 description = "Elegant visualizer and analyzer for LangGraph-like workflow graphs"
 readme = "README.md"
 requires-python = ">=3.9"
-authors = [{name = "Sarjak Maniar"}]
-license = {text = "MIT"}
+authors = [{ name = "Sarjak Maniar" }]
+license = { text = "MIT" }
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -19,3 +19,8 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/Sarjak369/langflow-viz"
 Repository = "https://github.com/Sarjak369/langflow-viz"
+
+[tool.hatch.build.targets.wheel]
+packages = ["langflow_viz"]
+
+
