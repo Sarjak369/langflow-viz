@@ -92,20 +92,22 @@ viz.render_all()
 from langflow_viz.graph import StateGraph
 from langflow_viz import Visualizer
 
+# Define workflow graph
 graph = StateGraph()
 graph.add_edge("start", "classify")
-graph.add_edge("classify", "creative", conditional=True)
-graph.add_edge("classify", "general")
-graph.add_edge("classify", "technical", conditional=True)
+graph.add_conditional_edge("classify", "creative")
+graph.add_conditional_edge("classify", "general")
+graph.add_conditional_edge("classify", "technical")
 graph.add_edge("creative", "end")
 graph.add_edge("general", "end")
 graph.add_edge("technical", "end")
 
+# Visualize and export
 viz = Visualizer(
     name="ConditionalFlow",
     nodes=graph.get_nodes(),
     edges=graph.get_edges(),
-    conditional_edges=graph.get_conditional_edges()
+    conditional_edges=graph.conditional_edges  
 )
 viz.render_all()
 
