@@ -1,16 +1,11 @@
 # 🌀 LangFlow-Viz
 
-**LangFlow-Viz** is a lightweight and elegant **workflow visualizer and analyzer** for LangGraph-like AI workflows.
+**A Python Library for Workflow Graph Visualization & Analysis**
 
-It helps developers, researchers, and engineers **build, inspect, and export workflow graphs** for agentic or state-based systems with **zero configuration**.
+LangFlow-Viz is a **lightweight yet powerful** toolkit for building, analyzing, and visualizing directed workflow graphs.
 
-> 🚀 Install in seconds
-> 
-> 
-> `pip install langflow-viz`
-> 
+It provides modular components to **model process flows**, **detect structural insights** (like cycles and dead ends), and **generate beautiful visualizations** in Graphviz, Mermaid, and HTML formats — all with a few lines of Python.
 
----
 
 <p align="left">
   <a href="https://pypi.org/project/langflow-viz/">
@@ -24,162 +19,225 @@ It helps developers, researchers, and engineers **build, inspect, and export wor
   </a>
 </p>
 
----
 
-## 🧩 Overview
 
-LangFlow-Viz brings clarity to complex agentic/state workflows:
+## ✨ Key Features
 
-- **Build** directed graphs programmatically (nodes, edges, conditions).
-- **Visualize** instantly in **Mermaid**, **Graphviz** (PNG/SVG), or **interactive HTML**.
-- **Analyze** structure for **cycles**, **dead-ends**, **path depth**, and more.
-- **Export** visuals & artifacts for docs, dashboards, or CI reports.
-
----
-
-## ✨ Features
-
-- 🧠 **Graph Construction** – Create directed workflow graphs programmatically.
-- 🎨 **Visual Rendering** – Export to **PNG**, **SVG**, **Mermaid**, or **interactive HTML**.
-- 🔍 **Graph Analysis** – Detect **cycles**, find **dead-ends**, compute **depth** & **fan-out**.
-- ⚙️ **Custom Styling** – Theme nodes/edges; highlight conditional branches & terminals.
-- 📦 **Lightweight** – No heavy deps; only `graphviz` required for Graphviz exports.
+- 🧩 **StateGraph Builder** — Create nodes, edges, and conditional (dashed) branches programmatically
+- 🔍 **GraphAnalyzer** — Automatically detect cycles, isolated nodes, and compute longest paths
+- 🎨 **Visualizer** — Export high-quality workflow diagrams (SVG, PNG, Mermaid, HTML)
+- ⚙️ **Modular Design** — Use each module independently or together
+- 🪄 **Fully Customizable** — Override colors, shapes, fonts, and themes via a global `STYLE` dictionary
+- 🔁 **Supports Parallel & Conditional Flows** — Model real-world pipelines and decision trees effortlessly
 
 ---
 
 ## 📦 Installation
 
+Install directly from PyPI:
+
 ```bash
 pip install langflow-viz
-# Optional: if you plan to export PNG/SVG via Graphviz
-# macOS: brew install graphviz
-# Linux: sudo apt-get install graphviz
-# Windows: choco install graphviz
+
+```
+
+Or from source:
+
+```bash
+git clone https://github.com/yourusername/langflow-viz.git
+cd langflow-viz
+pip install -e .
 
 ```
 
 ---
 
-## ⚡ Quickstart (30 seconds)
+## 🚀 Quick Start
 
-> The snippet below shows the typical flow: build → visualize → export.
-> 
-> 
-> Adjust to your graph objects / data structures; see in-code docstrings for details.
-> 
+### Example 1: Simple Sequential Workflow
 
 ```python
-# Quickstart example
-# (Names here illustrate the intended flow; see docstrings in the package for exact APIs.)
-from langflow_viz.visualizer import Visualizer
-from langflow_viz.analyzer import analyze
-from langflow_viz.exporter import save_mermaid, save_graphviz
+from langflow_viz import Visualizer, analyze_graph
 
-# 1) Define a tiny workflow
+# Define a simple flow
 nodes = ["start", "plan", "act", "reflect", "finish"]
 edges = [
     ("start", "plan"),
     ("plan", "act"),
     ("act", "reflect"),
-    ("reflect", "plan"),   # loop
-    ("act", "finish"),
+    ("reflect", "finish")
 ]
 
-# 2) Visualize (Mermaid & Graphviz)
-mermaid = Visualizer.to_mermaid(nodes, edges, title="LangFlow-Viz: Hello World")
-gv      = Visualizer.to_graphviz(nodes, edges, engine="dot")  # PNG/SVG/PDF via Graphviz
+# Analyze
+report = analyze_graph(nodes, edges)
+print("📊 Graph Analysis:", report)
 
-# 3) Analyze
-report = analyze(nodes, edges)  # e.g., {"cycles": [...], "dead_ends": [...], "depth": 4}
-print(report)
-
-# 4) Export
-save_mermaid(mermaid, "workflow.html")    # interactive HTML
-save_graphviz(gv, out="workflow.svg")     # vector graphics for docs
+# Visualize
+viz = Visualizer("LangFlowViz_Test", nodes, edges)
+viz.render_all()
 
 ```
 
-**Outputs you’ll get**
+### 🧾 Output:
 
-- `workflow.html` – shareable, interactive graph (Mermaid).
-- `workflow.svg` – crisp vector export (Graphviz).
-- Console report – structural insights (cycles, dead-ends, depth).
-
----
-
-## 🛠 API at a Glance
-
-> Full docstrings are included in the code; hover in your IDE or run help().
-> 
-- `Visualizer.to_mermaid(nodes, edges, title=None, theme="default")`
-- `Visualizer.to_graphviz(nodes, edges, engine="dot", theme="light")`
-- `analyzer.analyze(nodes, edges)` → `dict` report (cycles, dead-ends, depth, fan-out)
-- `exporter.save_mermaid(mermaid_str, path)`
-- `exporter.save_graphviz(graphviz_obj, out="workflow.svg" | "workflow.png")`
-
-*Notes*
-
-- **Nodes** may be strings or richer objects (id, label, type).
-- **Edges** are tuples `(src, dst)` or `(src, dst, label/condition)`.
+- **SVG:** `outputs/LangFlowViz_Test.svg`
+- **Mermaid:** `outputs/LangFlowViz_Test.mmd`
+- **PNG / HTML:** Optional rich export formats
 
 ---
 
-## 📚 Examples
+### Example 2: Conditional Workflow (Decision Branches)
 
-- **Minimal** – 5 nodes + loop, export Mermaid + SVG.
-- **Agentic** – plan → act → reflect loop with conditional exit to `finish`.
-- **State Machine** – clear state labels + terminal highlighting.
+```python
+from langflow_viz.graph import StateGraph
+from langflow_viz import Visualizer
 
-> Add an examples/ folder with runnable scripts to help users (recommended).
-> 
+graph = StateGraph()
+graph.add_edge("start", "classify")
+graph.add_edge("classify", "creative", conditional=True)
+graph.add_edge("classify", "general")
+graph.add_edge("classify", "technical", conditional=True)
+graph.add_edge("creative", "end")
+graph.add_edge("general", "end")
+graph.add_edge("technical", "end")
+
+viz = Visualizer(
+    name="ConditionalFlow",
+    nodes=graph.get_nodes(),
+    edges=graph.get_edges(),
+    conditional_edges=graph.get_conditional_edges()
+)
+viz.render_all()
+
+```
+
+💡 *Conditional edges appear as dashed lines, representing optional or decision-based transitions.*
 
 ---
 
-## ✅ Best Practices
+### Example 3: Parallel Tasks / Merge Flow
 
-- Keep labels **short & meaningful**.
-- Use **terminal styling** for `finish`/`error` nodes.
-- Keep the primary path visually **straight**, push alternates to branches.
-- Export **SVG** for docs and **HTML** for interactive sharing.
+```python
+from langflow_viz.graph import StateGraph
+from langflow_viz import Visualizer, analyze_graph
+
+g = StateGraph()
+g.add_edge("start", "task_A")
+g.add_edge("start", "task_B")
+g.add_edge("task_A", "merge")
+g.add_edge("task_B", "merge")
+g.add_edge("merge", "end")
+
+print(analyze_graph(g.get_nodes(), g.get_edges()))
+
+viz = Visualizer("ParallelFlow", g.get_nodes(), g.get_edges())
+viz.render_all()
+
+```
 
 ---
 
-## 🧪 Test locally
+## 🧠 Core Modules & API Reference
+
+### 🧩 **StateGraph** — Build Workflows
+
+`langflow_viz.graph.state_graph`
+
+| Method | Description |
+| --- | --- |
+| `add_node(name)` | Add a node if not already present |
+| `add_edge(src, dst, conditional=False)` | Add a directed edge (supports dashed/conditional edges) |
+| `add_conditional_edge(src, dst)` | Shortcut for dashed conditional edge |
+| `get_nodes()` | Return list of nodes |
+| `get_edges()` | Return list of all edges |
+| `get_conditional_edges()` | Return set of all dashed conditional edges |
+
+---
+
+### 🔍 **GraphAnalyzer** — Analyze Graph Topology
+
+`langflow_viz.graph.analyzer`
+
+| Method | Description |
+| --- | --- |
+| `summary()` | Returns node count, edge count, cycle detection, dead ends, and longest path |
+| `has_cycles()` | Detect if graph contains cycles |
+| `find_dead_ends()` | Identify nodes with no outgoing connections |
+| `longest_path_length()` | Compute the longest directed path length |
+
+### Shortcut:
+
+```python
+from langflow_viz import analyze_graph
+report = analyze_graph(nodes, edges)
+
+```
+
+---
+
+### 🎨 **Visualizer** — Create Beautiful Diagrams
+
+`langflow_viz.visualizer.visualizer`
+
+| Method | Description |
+| --- | --- |
+| `build_graph()` | Builds internal Graphviz structure |
+| `render_all()` | Exports SVG, PNG, Mermaid, and HTML files |
+| `to_mermaid(nodes, edges)` | Generates Mermaid diagram text |
+| `to_svg()` | Exports as SVG file |
+| `to_html(mermaid_text)` | Creates interactive HTML preview |
+
+**Constructor:**
+
+```python
+Visualizer(name: str, nodes: List[str], edges: List[Tuple[str, str]], conditional_edges: Optional[Set[Tuple[str, str]]] = None)
+
+```
+
+---
+
+### 📤 **Exporter** — Format Conversion Layer
+
+`langflow_viz.visualizer.exporter`
+
+| Method | Description |
+| --- | --- |
+| `to_mermaid(nodes, edges, dashed_edges)` | Convert to Mermaid syntax |
+| `to_svg()` | Export to SVG via Graphviz |
+| `to_png()` | Export to PNG |
+| `to_html(mermaid_text)` | Generate interactive HTML view |
+
+---
+
+### 🖌 **STYLE** — Customize Visuals
+
+`langflow_viz.visualizer.style`
+
+```python
+from langflow_viz.visualizer import STYLE
+
+STYLE["node"]["fillcolor"] = "#E8DAEF"
+STYLE["edge"]["color"] = "#8E44AD"
+
+```
+
+---
+
+## 🧪 Testing
+
+Test the library locally using:
 
 ```bash
-python - <<'PY'
-from langflow_viz.visualizer import Visualizer
-nodes = ["A","B","C"]; edges = [("A","B"), ("B","C")]
-print(Visualizer.to_mermaid(nodes, edges))
-PY
+python -m test_demo
 
 ```
 
----
-
-## 🚀 Using in CI
-
-- Generate a Mermaid HTML and attach as a **build artifact**.
-- Export Graphviz PNG/SVG and publish to **GitHub Pages** or docs site.
-- Fail builds when analysis finds **bad smells** (e.g., cycles in forbidden areas).
-
----
-
-## 🔗 Copy-Ready Badges (optional)
-
-```markdown
-[![PyPI](https://img.shields.io/pypi/v/langflow-viz.svg?label=PyPI&logo=pypi)](https://pypi.org/project/langflow-viz/)
-![Python versions](https://img.shields.io/pypi/pyversions/langflow-viz.svg)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+Expected Output:
 
 ```
-
----
-
-## 🧵 One-liner install (for your docs)
-
-```bash
-pip install langflow-viz
+📊 Graph Analysis: {'nodes': 5, 'edges': 4, 'has_cycles': False, 'dead_ends': ['finish'], 'longest_path': 4}
+✅ SVG saved at: outputs/LangFlowViz_Test.svg
+✅ Mermaid saved at: outputs/LangFlowViz_Test.mmd
 
 ```
 
@@ -187,82 +245,71 @@ pip install langflow-viz
 
 ## 🤝 Contributing
 
-PRs are welcome!
+Contributions are welcome!
 
-Good first issues: examples, docs, small features, or test coverage.
+To set up your development environment:
 
-- **Dev setup**
-    
-    ```bash
-    git clone https://github.com/Sarjak369/langflow-viz
-    cd langflow-viz
-    python -m venv .venv && source .venv/bin/activate
-    pip install -e .[dev]
-    
-    ```
-    
-- **Before committing (nice to have)**
-    
-    Add `pre-commit`, black/ruff/isort, and run tests locally.
-    
+```bash
+git clone https://github.com/yourusername/langflow-viz.git
+cd langflow-viz
+python -m venv .venv
+source .venv/bin/activate  # or .venv\Scripts\activate on Windows
+pip install -e ".[dev]"
+
+```
+
+### 🧩 Run Tests
+
+```bash
+pytest
+
+```
+
+### 🧱 Submit a Pull Request
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -m 'Add new visualization option'`)
+4. Push and open a Pull Request
 
 ---
 
-## 🗺 Roadmap
+## 📘 Documentation
 
-- [ ]  Node/edge **themes** & presets
-- [ ]  Built-in **layout helpers**
-- [ ]  **Jupyter** widget for interactive notebooks
-- [ ]  Export **PNG/SVG** without system Graphviz (pure-Python fallback)
+Comprehensive developer documentation is coming soon at:
+
+👉 https://langflow-viz.readthedocs.io
 
 ---
 
 ## 🧾 License
 
-**MIT** – do anything with attribution & no warranty. See `LICENSE`.
+Licensed under the **MIT License** © 2025
+
+Developed and maintained by the LangFlow-Viz Team.
 
 ---
 
-## 🙋 FAQ
+## 💬 Community
 
-**Q: Do I need Graphviz installed?**
+Join the discussion, share workflows, and suggest improvements:
 
-A: Only for Graphviz exports (PNG/SVG/PDF). Mermaid/HTML works without it.
+📢 GitHub Discussions → https://github.com/Sarjak369/langflow-viz/discussions
 
-**Q: Does it support conditional branches?**
-
-A: Yes—edges can carry labels/conditions; styled distinctly in output.
-
-**Q: Can I embed the graph in my docs site?**
-
-A: Yes—use the Mermaid HTML export or SVG.
 
 ---
 
-## 📣 Changelog
+## 🌟 Why LangFlow-Viz?
 
-See [**Releases**](https://github.com/Sarjak369/langflow-viz/releases) for what’s new.
+LangFlow-Viz helps developers, researchers, and AI engineers **visualize and analyze workflow graphs** effortlessly.
 
----
+It’s built for clarity, precision, and speed — designed to turn your logical pipelines into beautiful, meaningful diagrams.
 
-## ⭐ Why LangFlow-Viz?
+## 🪶 Attribution
 
-- Clear mental model for complex agent pipelines
-- High-quality exports for docs, PRDs, and dashboards
-- Tiny API surface; ergonomic defaults; fast iterations
+All design, icons, and visual elements are purely for **illustrative and educational purposes**.
 
-If this saves you time, please consider **starring the repo** — it helps others find it. 💙
+LangFlow-Viz is open-source and welcomes contributions, improvements, and feature requests from the community.
 
----
+That’s it — happy visualizing! ✨
 
-### Attribution
-
-Logo/emoji and brand elements are used for illustrative purposes only.
-
-## 🧠 TL;DR
-
-- Build a graph → `StateGraph()`
-- Analyze → `analyze(graph)`
-- Render/export → `render(graph)` → `.to_mermaid() | .to_svg() | .to_png() | .to_html()`
-
-That’s it. Happy visualizing! ✨

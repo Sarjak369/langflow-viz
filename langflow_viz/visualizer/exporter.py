@@ -31,43 +31,55 @@ class Exporter:
         return out
 
     # ---------- Mermaid ----------
+    # langflow_viz/visualizer/exporter.py
+
     def to_mermaid(
         self,
         nodes: Iterable[str],
         edges: Iterable[Edge],
         dashed_edges: Iterable[Edge] | None = None,
     ) -> str:
-        """Write a .mmd file. Edges listed in `dashed_edges` are dashed."""
         dashed: Set[Edge] = set(dashed_edges or [])
-
         parts: list[str] = [
             "flowchart TD",
-            # classes
             "classDef start fill:#efe9ff,stroke:#c7b8ff,stroke-width:1.2px,color:#1f2937,rx:12,ry:12;",
             "classDef endClass fill:#efe9ff,stroke:#c7b8ff,stroke-width:1.2px,color:#1f2937,rx:12,ry:12;",
             "classDef node fill:#efe9ff,stroke:#c7b8ff,stroke-width:1.2px,color:#1f2937,rx:12,ry:12;",
             "classDef highlight fill:#efe9ff,stroke:#6d28d9,stroke-width:2px,color:#1f2937,rx:12,ry:12;",
         ]
 
-        # nodes
+        # Nodes
         parts.append('n_START(["START"]):::start')
         for n in nodes:
             parts.append(f'n_{n}(["{n}"]):::node')
         parts.append('n_END(["END"]):::endClass')
 
-        # edges
+        # Task edges
         edges_list = list(edges)
         for src, dst in edges_list:
-            parts.append(f"    n_{src} --> n_{dst}")
+            parts.append(f"n_{src} --> n_{dst}")
 
-        # style each link (dashed for conditionals)
+        # Style edges (dashed for conditionals)
         for i, (src, dst) in enumerate(edges_list):
             if (src, dst) in dashed:
                 parts.append(
-                    f"linkStyle {i} stroke:#6d28d9,stroke-width:3px,stroke-dasharray:6 4"
-                )
+                    f"linkStyle {i} stroke:#6d28d9,stroke-width:3px,stroke-dasharray:6 4")
             else:
                 parts.append(f"linkStyle {i} stroke:#6d28d9,stroke-width:3px")
+
+        # ---- NEW: connect START and END ----
+        nodes_set = set(nodes)
+        successors = {u for (u, v) in edges_list}
+        predecessors = {v for (u, v) in edges_list}
+        roots = list(
+            nodes_set - predecessors) or ([next(iter(nodes))] if nodes else [])
+        sinks = list(
+            nodes_set - successors) or ([list(nodes)[-1]] if nodes else [])
+
+        for r in roots:
+            parts.append(f"n_START --> n_{r}")
+        for s in sinks:
+            parts.append(f"n_{s} --> n_END")
 
         text = "\n".join(parts)
         mmd_path = Path("outputs") / f"{self.name}.mmd"
@@ -75,6 +87,7 @@ class Exporter:
         return str(mmd_path)
 
     # ---------- HTML wrapper ----------
+
     def to_html(self, mermaid_text: str) -> str:
         html = f"""<!doctype html>
 <html>

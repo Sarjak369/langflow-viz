@@ -57,3 +57,9 @@ class GraphAnalyzer:
             "dead_ends": self.find_dead_ends(),
             "longest_path": self.longest_path_length(),
         }
+
+
+def analyze_graph(nodes, edges):
+    """Convenience function to get a graph summary directly."""
+    ga = GraphAnalyzer(nodes, edges)
+    return ga.summary()
