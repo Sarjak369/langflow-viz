@@ -4,11 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "langflow-viz"
-version = "0.2.0"
+version = "0.2.1"
 description = "Elegant visualizer and analyzer for LangGraph-like workflow graphs"
 readme = "README.md"
 requires-python = ">=3.9"
-authors = [{ name = "Sarjak Maniar", email = "sarjakm369@gmail.com" }]
+authors = [
+  { name = "Sarjak Maniar", email = "sarjakm369@gmail.com" }
+]
 license = { text = "MIT" }
 classifiers = [
     "Programming Language :: Python :: 3",
