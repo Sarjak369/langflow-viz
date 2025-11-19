@@ -44,7 +44,7 @@ pip install langflow-viz
 Or from source:
 
 ```bash
-git clone https://github.com/yourusername/langflow-viz.git
+git clone https://github.com/Sarjak369/langflow-viz.git
 cd langflow-viz
 pip install -e .
 
